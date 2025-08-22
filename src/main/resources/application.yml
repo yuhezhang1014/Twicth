@@ -4,7 +4,7 @@ spring:
   cloud:
     openfeign:
       oauth2:
-        enabled: true # openfeign打开oauth2
+        enabled: true # 打开 OpenFeign 的 OAuth2 支持
         clientRegistrationId: twitch # 验证的模块是twitch，连接到20行
       client:
         config:
@@ -34,7 +34,7 @@ spring:
     # Spring Boot 解析 driver-class-name: com.mysql.cj.jdbc.Driver，并使用 Class.forName("com.mysql.cj.jdbc.Driver") 加载 MySQL JDBC 驱动
   sql: # 和 database-init.sql 文件进行连接
     init:
-      mode: ${DATABASE_INIT:always} # 每次运行时都把数据库清空
+      mode: ${DATABASE_INIT:never} # 每次运行时都把数据库清空
       schema-locations: "classpath:database-init.sql"
   cache:
     caffeine:
