@@ -26,13 +26,19 @@ public class FavoriteController {
         this.userService = userService;
     }
 
+    /**
+     * 获取收藏过的项目
+     */
     @GetMapping
     public TypeGroupedItemList getFavoriteItems(@AuthenticationPrincipal User user) {
         UserEntity userEntity = userService.findByUsername(user.getUsername());
         return favoriteService.getGroupedFavoriteItems(userEntity);
     }
 
-    // RequestBody : 前端以JSON的格式（Body）发送请求给后端，而不是直接写在URL里（不安全，空间小）
+    /**
+     * 收藏某个项目
+     * RequestBody : 前端以JSON的格式（Body）发送请求给后端，而不是直接写在URL里（不安全，空间小）
+     */
     @PostMapping
     public void setFavoriteItem(@AuthenticationPrincipal User user, @RequestBody FavoriteRequestBody body) {
         UserEntity userEntity = userService.findByUsername(user.getUsername());
@@ -43,6 +49,9 @@ public class FavoriteController {
         }
     }
 
+    /**
+     * 取消收藏
+     */
     @DeleteMapping
     public void unsetFavoriteItem(@AuthenticationPrincipal User user, @RequestBody FavoriteRequestBody body) {
         UserEntity userEntity = userService.findByUsername(user.getUsername());

@@ -14,7 +14,7 @@ public record TypeGroupedItemList(
         List<ItemEntity> clips
 ) {
 
-    // 过滤；数据库里是不分类的，拿到的直接是所有items
+    // 分类：数据库里是不分类的，拿到的直接是所有items，这里转换成对应的类型
     public TypeGroupedItemList(List<ItemEntity> items) {
         this(
                 filterForType(items, ItemType.STREAM),

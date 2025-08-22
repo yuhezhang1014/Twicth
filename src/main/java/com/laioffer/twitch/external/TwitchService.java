@@ -15,6 +15,7 @@ public class TwitchService {
 
     private final TwitchApiClient twitchApiClient;
 
+    // 这里的TwitchApiClient其实不是接口了已经，是 Spring 给 TwitchApiClient 生成的一个实现类（代理对象）（代理模式）
     public TwitchService(TwitchApiClient twitchApiClient) {
         this.twitchApiClient = twitchApiClient;
     }
