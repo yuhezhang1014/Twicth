@@ -24,6 +24,9 @@ public class FavoriteService {
         this.favoriteRecordRepository = favoriteRecordRepository;
     }
 
+    /**
+     * 收藏某个项目
+     */
     @CacheEvict(cacheNames = "recommend_items", key = "#user") // 清理缓存，清理"recommend_items"这个缓存，清理当前"#user"的
     @Transactional // 一系列的操作。比如银行转钱，A向B转，B出现了异常，要抛出来，此时A扣钱的指令也要撤回掉，这个叫做回滚。能实现这种回滚的就是transaction。一般有多个写操作就要（save）
     public void setFavoriteItem(UserEntity user, ItemEntity item) {
@@ -38,6 +41,9 @@ public class FavoriteService {
         favoriteRecordRepository.save(favoriteRecord);
     }
 
+    /**
+     * 取消收藏
+     */
     @CacheEvict(cacheNames = "recommend_items", key = "#user")
     public void unsetFavoriteItem(UserEntity user, String twitchId) {
         ItemEntity item = itemRepository.findByTwitchId(twitchId);
@@ -46,11 +52,17 @@ public class FavoriteService {
         }
     }
 
+    /**
+     * 辅助方法：获取当前用户的收藏列表（entity）
+     */
     public List<ItemEntity> getFavoriteItems(UserEntity user) {
         List<Long> favoriteItemIds = favoriteRecordRepository.findFavoriteItemIdsByUserId(user.id());
         return itemRepository.findAllById(favoriteItemIds); // 读一个user所有点赞的item
     }
 
+    /**
+     * 获取当前用户的收藏列表（封装后）
+     */
     public TypeGroupedItemList getGroupedFavoriteItems(UserEntity user) {
         List<ItemEntity> items = getFavoriteItems(user);
         return new TypeGroupedItemList(items); // 整理一下，分类

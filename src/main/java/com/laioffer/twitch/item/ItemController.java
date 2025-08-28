@@ -15,6 +15,9 @@ public class ItemController {
         this.itemService = itemService;
     }
 
+    /**
+     * 根据游戏id查询对应的项目（从twitch）
+     */
     @GetMapping("/search")
     public TypeGroupedItemList search(@RequestParam("game_id") String gameId) { // 需要提供game id
         return itemService.getItems(gameId);

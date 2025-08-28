@@ -14,7 +14,27 @@ public record TypeGroupedItemList(
         List<ItemEntity> clips
 ) {
 
-    // 分类：数据库里是不分类的，拿到的直接是所有items，这里转换成对应的类型
+    // 全参构造器（默认的，JVM会创建）可以不用写出来
+    // 任何额外的重载构造器都必须用 this(...) 调它初始化字段，就像下面那样
+    public TypeGroupedItemList(
+            List<ItemEntity> streams,
+            List<ItemEntity> videos,
+            List<ItemEntity> clips
+    ) {
+        this.streams = streams;
+        this.videos = videos;
+        this.clips = clips;
+    }
+
+    // 因为 record 的变量都是 final，所以不能这样构造
+//    public TypeGroupedItemList(List<ItemEntity> items) {
+//        this.streams = filterForType(items, ItemType.STREAM);
+//        this.videos = filterForType(items, ItemType.VIDEO);
+//        this.clips = filterForType(items, ItemType.CLIP);
+//    }
+
+    // 从数据库里拿：要分类，数据库里是不分类的，拿到的直接是所有items，这里转换成对应的类型
+    // this: 这不是直接赋值给字段，而是调用 canonical constructor（全参构造器）
     public TypeGroupedItemList(List<ItemEntity> items) {
         this(
                 filterForType(items, ItemType.STREAM),
@@ -23,7 +43,7 @@ public record TypeGroupedItemList(
         );
     }
 
-    // 这里是分好的，但是数据类型不对，如从streams转换为item entity
+    // 从twitch拿：这里是分好类的，但是数据类型不对，要全部转为item entity
     public TypeGroupedItemList(String gameId, List<Stream> streams, List<Video> videos, List<Clip> clips) {
         this(
                 fromStreams(streams),

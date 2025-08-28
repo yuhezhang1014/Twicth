@@ -21,7 +21,10 @@ public class ItemService {
         this.twitchService = twitchService;
     }
 
-    // 从twitch中拿，调用twitchService，twitchService再调用TwitchApiClient；SEARCH_RESULT_SIZE就是那个first
+    /**
+     * 根据游戏id查询对应的项目（从twitch）
+     * 从twitch中拿，调用twitchService，twitchService再调用TwitchApiClient；SEARCH_RESULT_SIZE就是那个first
+     */
     @Cacheable("items") // 可以在postman里面试，第二次会比第一次快很多，1分钟之后又变慢，因为过期了
     public TypeGroupedItemList getItems(String gameId) {
         List<Video> videos = twitchService.getVideos(gameId, SEARCH_RESULT_SIZE);

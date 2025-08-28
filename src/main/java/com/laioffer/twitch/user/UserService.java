@@ -23,18 +23,25 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    @Transactional // 有多个写操作，中间出错还可以撤回
+    /**
+     * 注册
+     * 事务：有多个写操作，中间出错还可以撤回
+     */
+    @Transactional
     public void register(String username, String password, String firstName, String lastName) {
         UserDetails user = User.builder() // 它自己的api，builder pattern。为什么不直接new？因为看不出来顺序对不对（比如有30个string的参数），可读性差，维护性差
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .roles("USER") // authentication table
                 .build();
-        userDetailsManager.createUser(user); // 创建user,通常存入 users 表
+        userDetailsManager.createUser(user); // 创建user，通常存入 users 表
         userRepository.updateNameByUsername(username, firstName, lastName); // 让Spring Boot更新一下
     }
 
-    public UserEntity findByUsername(String username) { // 通过username查找user entity
+    /**
+     * 辅助方法：通过用户名查找用户 entity
+     */
+    public UserEntity findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 }
