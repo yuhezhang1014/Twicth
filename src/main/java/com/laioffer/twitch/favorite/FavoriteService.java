@@ -30,13 +30,20 @@ public class FavoriteService {
     @CacheEvict(cacheNames = "recommend_items", key = "#user") // 清理缓存，清理"recommend_items"这个缓存，清理当前"#user"的
     @Transactional // 一系列的操作。比如银行转钱，A向B转，B出现了异常，要抛出来，此时A扣钱的指令也要撤回掉，这个叫做回滚。能实现这种回滚的就是transaction。一般有多个写操作就要（save）
     public void setFavoriteItem(UserEntity user, ItemEntity item) {
+        // 1. 查询 item 是否存在
         ItemEntity persistedItem = itemRepository.findByTwitchId(item.twitchId()); // 看看存不存在，因为只有有人点过赞才会从twitch里存进数据库里
+
+        // 2. 如果不存在，保存到数据库
         if (persistedItem == null) { // 没有就存一下，相当于是第一个人赞了
             persistedItem = itemRepository.save(item);
         }
+
+        // 3. 检查是否已经收藏过
         if (favoriteRecordRepository.existsByUserIdAndItemId(user.id(), persistedItem.id())) { // 如果有人已经赞过了，数据库里已经有了，就会有id
             throw new DuplicateFavoriteException(); // 如果这个点赞关系已经存在，即这个用户已经点赞过，就抛一个exception，函数会终止，返回上一层
         }
+
+        // 4. 保存收藏关系
         FavoriteRecordEntity favoriteRecord = new FavoriteRecordEntity(null, user.id(), persistedItem.id(), Instant.now()); // 创建一个新的点赞关系
         favoriteRecordRepository.save(favoriteRecord);
     }
