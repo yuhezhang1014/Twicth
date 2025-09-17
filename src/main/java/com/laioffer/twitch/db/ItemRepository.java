@@ -9,4 +9,6 @@ public interface ItemRepository extends ListCrudRepository<ItemEntity, Long> {
     // 根据函数名的find知道执行的是select语句，twitch_id也是函数名里的ByTwitchId
     // 查官方文档，找这些对应关系
     ItemEntity findByTwitchId(String twitchId);
+    @org.springframework.data.jdbc.repository.query.Query("SELECT game_id AS gameId, COUNT(1) AS cnt FROM items i JOIN favorite_records f ON f.item_id = i.id WHERE f.user_id = :userId GROUP BY game_id")
+    java.util.List<com.laioffer.twitch.recommendation.BehaviorCount> countFavoritesByGameForUser(Long userId);
 }

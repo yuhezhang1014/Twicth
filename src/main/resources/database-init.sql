@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS comment_likes;
+DROP TABLE IF EXISTS item_views;
 DROP TABLE IF EXISTS favorite_records; -- 如果存在就清除掉，每次运行都把数据清空
 DROP TABLE IF EXISTS authorities;
 DROP TABLE IF EXISTS items;
@@ -45,4 +48,37 @@ CREATE TABLE favorite_records -- 记录用户的收藏、点赞信息
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
     UNIQUE KEY unique_item_and_user_combo (item_id, user_id)
     -- UNIQUE KEY：item_id和user_id的组合是unique的，不能重复存储，就是点赞过后不能再点赞了
+);
+
+CREATE TABLE comments -- 评论表
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    twitch_id VARCHAR(255) NOT NULL,
+    user_id INT NOT NULL,
+    content VARCHAR(500) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_comments_twitch_id_created_at (twitch_id, created_at DESC)
+);
+
+CREATE TABLE comment_likes -- 评论点赞表
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    comment_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_comment_user (comment_id, user_id),
+    INDEX idx_comment_likes_comment_id (comment_id)
+);
+
+CREATE TABLE item_views -- 浏览记录
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    twitch_id VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_item_views_user_twitch_time (user_id, twitch_id, created_at)
 );

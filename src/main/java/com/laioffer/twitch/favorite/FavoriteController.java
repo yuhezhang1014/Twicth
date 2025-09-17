@@ -1,12 +1,12 @@
 package com.laioffer.twitch.favorite;
 
+import com.laioffer.twitch.auth.AuthUtils;
 import com.laioffer.twitch.db.entity.UserEntity;
 import com.laioffer.twitch.model.FavoriteRequestBody;
 import com.laioffer.twitch.model.TypeGroupedItemList;
 import com.laioffer.twitch.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,8 +30,9 @@ public class FavoriteController {
      * 获取收藏过的项目
      */
     @GetMapping
-    public TypeGroupedItemList getFavoriteItems(@AuthenticationPrincipal User user) {
-        UserEntity userEntity = userService.findByUsername(user.getUsername());
+    public TypeGroupedItemList getFavoriteItems(@AuthenticationPrincipal Object principal) {
+        String username = AuthUtils.getUsername(principal);
+        UserEntity userEntity = userService.findByUsername(username);
         return favoriteService.getGroupedFavoriteItems(userEntity);
     }
 
@@ -40,8 +41,9 @@ public class FavoriteController {
      * RequestBody : 前端以JSON的格式（Body）发送请求给后端，而不是直接写在URL里（不安全，空间小）
      */
     @PostMapping
-    public void setFavoriteItem(@AuthenticationPrincipal User user, @RequestBody FavoriteRequestBody body) {
-        UserEntity userEntity = userService.findByUsername(user.getUsername());
+    public void setFavoriteItem(@AuthenticationPrincipal Object principal, @RequestBody FavoriteRequestBody body) {
+        String username = AuthUtils.getUsername(principal);
+        UserEntity userEntity = userService.findByUsername(username);
         try {
             favoriteService.setFavoriteItem(userEntity, body.favorite());
         } catch (DuplicateFavoriteException e) {
@@ -53,8 +55,9 @@ public class FavoriteController {
      * 取消收藏
      */
     @DeleteMapping
-    public void unsetFavoriteItem(@AuthenticationPrincipal User user, @RequestBody FavoriteRequestBody body) {
-        UserEntity userEntity = userService.findByUsername(user.getUsername());
+    public void unsetFavoriteItem(@AuthenticationPrincipal Object principal, @RequestBody FavoriteRequestBody body) {
+        String username = AuthUtils.getUsername(principal);
+        UserEntity userEntity = userService.findByUsername(username);
         favoriteService.unsetFavoriteItem(userEntity, body.favorite().twitchId());
     }
 }
